@@ -67,8 +67,11 @@ void dealloc(Node* head)
 //   function object struct declarations
 // -----------------------------------------------
 
-
-
+struct RemoveEven { 
+    bool operator()(int i) { 
+        return (i % 2 == 0); 
+    }
+};
 
 
 int main(int argc, char* argv[])
@@ -87,8 +90,19 @@ int main(int argc, char* argv[])
 
     // Test out your linked list code
 
+    cout << "Filtered List: " << endl; 
+    print(llfilter(head, RemoveEven()));
 
+    Node* smaller = nullptr;
+    Node* larger = nullptr; 
 
+    llpivot(head, smaller, larger, 8); 
+
+    cout << "Smaller: "; 
+    print(smaller); 
+
+    cout << "Larger: "; 
+    print(larger); 
     
     return 0;
 

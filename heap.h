@@ -2,6 +2,7 @@
 #define HEAP_H
 #include <functional>
 #include <stdexcept>
+#include <vector>
 
 template <typename T, typename PComparator = std::less<T> >
 class Heap
@@ -11,7 +12,7 @@ public:
    * @brief Construct a new Heap object
    * 
    * @param m ary-ness of heap tree (default to 2)
-   * @param c binary predicate function/functor that takes two items
+   * @param c binary predicate function/functor that takes two heap
    *          as an argument and returns a bool if the first argument has
    *          priority over the second.
    */
@@ -61,14 +62,56 @@ public:
 
 private:
   /// Add whatever helper functions and data members you need below
-
-
-
+  std::vector<T> items; 
+  int m_; 
+  PComparator comparator_; 
+  void swap(int a, int b); 
 
 };
 
 // Add implementation of member functions here
 
+template <typename T, typename PComparator>
+Heap<T, PComparator>::Heap(int m, PComparator c) 
+  : m_(m), comparator_(c)
+{
+
+}
+template <typename T, typename PComparator>
+Heap<T, PComparator>::~Heap(){ 
+
+}
+
+template <typename T, typename PComparator>
+void Heap<T, PComparator>::swap(int a, int b) { 
+  T temp = items[a]; 
+  items[a] = items[b]; 
+  items[b] = temp; 
+}
+
+template <typename T, typename PComparator>
+void Heap<T, PComparator>::push(const T& item){ 
+  items.push_back(item); 
+  int child = items.size() - 1; 
+  int parent = (child-1)/m_;
+
+
+  while(child > 0 && comparator_(items[child], items[parent])) { 
+    swap(child, parent); 
+    child = parent; 
+    parent = (child - 1)/m_;
+  }
+}
+
+template <typename T, typename PComparator>
+bool Heap<T, PComparator>::empty() const { 
+  return items.empty(); 
+}
+
+template <typename T, typename PComparator>
+size_t Heap<T, PComparator>::size() const{
+  return items.size();
+}
 
 // We will start top() for you to handle the case of 
 // calling top on an empty heap
@@ -81,14 +124,12 @@ T const & Heap<T,PComparator>::top() const
     // ================================
     // throw the appropriate exception
     // ================================
-
+    throw std::underflow_error("Heap is empty");
 
   }
   // If we get here we know the heap has at least 1 item
   // Add code to return the top element
-
-
-
+  return items[0]; 
 }
 
 
@@ -101,14 +142,34 @@ void Heap<T,PComparator>::pop()
     // ================================
     // throw the appropriate exception
     // ================================
-
-
+    throw std::underflow_error("Heap is empty");
   }
 
+  items[0] = items.back();
+  items.pop_back();
+
+  size_t parent = 0, child, best; 
+  bool isFixed = false; 
 
 
+  while(!isFixed) {
+    best = parent; 
+    for (int i = 1; i <= m_; i++) { 
+      child = (m_ * parent) + i; 
+      if (child < items.size() && comparator_(items[child], items[best])) {
+        best = child;
+      }
+    }
+
+    if (best == parent) { 
+      isFixed = true; 
+    }
+    else { 
+      swap(parent, best); 
+      parent = best; 
+    }
+  }
 }
-
 
 
 #endif

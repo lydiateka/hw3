@@ -6,7 +6,7 @@
 #include "wire.h"
 
 Gate::Gate(int num_inputs, Wire* output) 
-	: m_output(output), m_inputs(num_inputs), m_delay(0), m_current_state('X')
+	: m_output(output), m_inputs(num_inputs), m_delay(0),m_current_state('X')
 {
     
 }
@@ -61,6 +61,7 @@ Or2Gate::Or2Gate(Wire* a, Wire* b, Wire* o) : Gate(2,o)
     wireInput(1,b);
 }
 
+
 Event* Or2Gate::update(uint64_t current_time)
 {
     
@@ -82,8 +83,42 @@ Event* Or2Gate::update(uint64_t current_time)
   if(state != m_current_state)
 	{
     m_current_state = state;
-		uint64_t next = current_time + m_delay;
-		e = new Event {next,m_output,state};
+	uint64_t next = current_time + m_delay;
+	e = new Event {next,m_output,state};
+         
+	}
+  return e;
+}
+
+NotGate::NotGate(Wire* a, Wire* o) : Gate(1,o) 
+{
+	wireInput(0, a);
+}
+
+Event* NotGate::update(uint64_t current_time)
+{
+    
+  char state = '0';
+  Event* e = nullptr;
+	char in = m_inputs[0]->getState();
+	
+	if(in == '1')
+	{
+		state = '0';
+	}
+	else if (in == '0') { 
+		state = '1';
+	}
+	else if(in == 'X')
+	{
+		state = 'X';
+	}	
+
+  if(state != m_current_state)
+	{
+    m_current_state = state;
+	uint64_t next = current_time + m_delay;
+	e = new Event {next,m_output,state};
          
 	}
   return e;
